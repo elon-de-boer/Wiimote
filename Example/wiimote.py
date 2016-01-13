@@ -5,6 +5,60 @@
 # Coded by The Raspberry Pi Guy. Work based on some of Matt Hawkins's!
 
 import cwiid, time
+import RPi.GPIO as GPIO
+import time
+
+#MOTOR ZOOI
+GPIO.setmode(GPIO.BCM)
+
+pinMotorAForwards = 10
+pinMotorABackwards = 9
+pinMotorBForwards = 8
+pinMotorBBackwards = 7
+
+Frequency = 40
+DutyCycleA = 30
+DutyCycleB = 30
+Stop = 0
+
+GPIO.setup(pinMotorAForwards, GPIO.OUT)
+GPIO.setup(pinMotorABackwards, GPIO.OUT)
+GPIO.setup(pinMotorBForwards, GPIO.OUT)
+GPIO.setup(pinMotorBBackwards, GPIO.OUT)
+
+pwmMotorAForwards = GPIO.PWM(pinMotorAForwards, Frequency)
+pwmMotorABackwards = GPIO.PWM(pinMotorABackwards, Frequency)
+pwmMotorBForwards = GPIO.PWM(pinMotorBForwards, Frequency)
+pwmMotorBBackwards = GPIO.PWM(pinMotorBBackwards, Frequency)
+
+pwmMotorAForwards.start(Stop)
+pwmMotorABackwards.start(Stop)
+pwmMotorBForwards.start(Stop)
+pwmMotorBBackwards.start(Stop)
+
+def StopMotors():
+  pwmMotorAForwards.ChangeDutyCycle(Stop)
+  pwmMotorABackwards.ChangeDutyCycle(Stop)
+  pwmMotorBForwards.ChangeDutyCycle(Stop)
+  pwmMotorBBackwards.ChangeDutyCycle(Stop)
+
+def Forwards():
+  pwmMotorAForwards.ChangeDutyCycle(DutyCycleA)
+  pwmMotorABackwards.ChangeDutyCycle(Stop)
+
+def Backwards():
+  pwmMotorAForwards.ChangeDutyCycle(Stop)
+  pwmMotorABackwards.ChangeDutyCycle(DutyCycleA)
+
+def Left():
+  pwmMotorBForwards.ChangeDutyCycle(DutyCycleB)
+  pwmMotorBBackwards.ChangeDutyCycle(Stop)
+
+def Right():
+  pwmMotorBForwards.ChangeDutyCycle(Stop)
+  pwmMotorBBackwards.ChangeDutyCycle(DutyCycleB)
+  
+
 
 button_delay = 0.1
 
@@ -41,23 +95,23 @@ while True:
 
   # The following code detects whether any of the Wiimotes buttons have been pressed and then prints a statement to the screen!
   if (buttons & cwiid.BTN_LEFT):
-    print 'Left pressed'
+    Backwards()
     time.sleep(button_delay)
 
   if(buttons & cwiid.BTN_RIGHT):
-    print 'Right pressed'
+    Forwards()
     time.sleep(button_delay)
 
   if (buttons & cwiid.BTN_UP):
-    print 'Up pressed'
+    Left()
     time.sleep(button_delay)
 
   if (buttons & cwiid.BTN_DOWN):
-    print 'Down pressed'
+    Right()
     time.sleep(button_delay)
 
   if (buttons & cwiid.BTN_1):
-    print 'Button 1 pressed'
+    print 'Button 1 pressed
     time.sleep(button_delay)
 
   if (buttons & cwiid.BTN_2):
@@ -69,7 +123,7 @@ while True:
     time.sleep(button_delay)
 
   if (buttons & cwiid.BTN_B):
-    print 'Button B pressed'
+    StopMotors()
     time.sleep(button_delay)
 
   if (buttons & cwiid.BTN_HOME):
@@ -82,9 +136,13 @@ while True:
     time.sleep(button_delay)
 
   if (buttons & cwiid.BTN_MINUS):
-    print 'Minus Button pressed'
+    DutyCycleA = DutyCycleA - 5
+    if DutyCycleA < 10:
+      DutyCycleA = DutyCycleA + 5
     time.sleep(button_delay)
 
   if (buttons & cwiid.BTN_PLUS):
-    print 'Plus Button pressed'
+    DutyCycleA = DutyCycleA + 5
+    if DutyCycleA > 100:
+      DutyCycleA = DutyCycleA - 10
     time.sleep(button_delay)
